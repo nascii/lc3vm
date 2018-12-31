@@ -1,42 +1,27 @@
-use lc3vm::{Processor, TrapHandlers};
+use lc3vm::{Environment, FromMemory, Memory, Processor};
 
-struct TermEmulator {
+struct Env {
     memory: Memory,
     processor: Processor,
 }
 
-impl TrapHandlers for TermEmulator {
-    fn getc(&mut self) -> Value {
+impl Environment for TermEmulator {
+    fn get_char(&mut self) -> Value {
         unimplemented!();
     }
 
-    fn out(&mut self, value: Value) {
+    fn put_char(&mut self, value: Value) {
         let ch = char::from(value);
         println!("{}", ch);
     }
 
-    fn puts(&mut self, loc: Value) {
-        unimplemented!();
+    fn read_mem<R: FromMemory>(&mut self, loc: Value) -> R {
+        self.memory.load(loc)
     }
 
-    fn in(&mut self, loc: Value) -> Value {
-        unimplemented!();
+    fn write_mem(&mut self, loc: Value, value: Value) {
+        self.memory.save(loc, value)
     }
-
-    fn putsp(&mut self, loc: Value) {
-        unimplemented!();
-    }
-
-    fn halt(&mut self) {
-        println!("LOLKEK");
-    }
-}
-
-fn main() {
-    let config = get_config();
-
-    let contents = fs::read_to_string(config.file_path);
-    println!("With text:\n{:?}", contents);
 }
 
 struct Config {
@@ -50,3 +35,9 @@ fn get_config() -> Config {
     Config { file_path }
 }
 
+fn main() {
+    let config = get_config();
+
+    let contents = fs::read_to_string(config.file_path);
+    println!("With text:\n{:?}", contents);
+}
